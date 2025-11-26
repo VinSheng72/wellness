@@ -31,6 +31,7 @@ export default function EventForm({ companyName, companyId }: EventFormProps) {
   const [streetName, setStreetName] = useState('');
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingItems, setIsLoadingItems] = useState(true);
   const [error, setError] = useState('');
 
   // Fetch event items on component mount
@@ -41,18 +42,24 @@ export default function EventForm({ companyName, companyId }: EventFormProps) {
         if (response.ok) {
           const data = await response.json();
           setEventItems(data.eventItems || []);
+        } else {
+          showToast('Failed to load event types', 'error');
         }
       } catch (err) {
         console.error('Failed to fetch event items:', err);
+        showToast('Failed to load event types', 'error');
+      } finally {
+        setIsLoadingItems(false);
       }
     };
 
     fetchEventItems();
-  }, []);
+  }, [showToast]);
 
   // Postal code lookup
   const handlePostalCodeLookup = async () => {
     if (!postalCode.trim()) {
+      showToast('Please enter a postal code first', 'warning');
       return;
     }
 
@@ -63,10 +70,16 @@ export default function EventForm({ companyName, companyId }: EventFormProps) {
         const data = await response.json();
         if (data.streetName) {
           setStreetName(data.streetName);
+          showToast('Street name found!', 'success');
+        } else {
+          showToast('No street name found. Please enter manually.', 'info');
         }
+      } else {
+        showToast('Postal code lookup failed. Please enter street name manually.', 'warning');
       }
     } catch (err) {
       console.error('Postal code lookup failed:', err);
+      showToast('Postal code lookup unavailable. Please enter street name manually.', 'warning');
     } finally {
       setIsLookingUp(false);
     }
@@ -81,20 +94,52 @@ export default function EventForm({ companyName, companyId }: EventFormProps) {
   const validateForm = (): boolean => {
     // Validate event item selection
     if (!selectedEventItem) {
-      setError('Please select an event item');
+      const errorMsg = 'Please select an event type from the dropdown';
+      setError(errorMsg);
+      showToast(errorMsg, 'warning');
       return false;
     }
 
     // Validate exactly 3 proposed dates
     const filledDates = proposedDates.filter((date) => date.trim() !== '');
-    if (filledDates.length !== 3) {
-      setError('Please provide exactly 3 proposed dates');
+    if (filledDates.length === 0) {
+      const errorMsg = 'Please provide 3 proposed dates for the event';
+      setError(errorMsg);
+      showToast(errorMsg, 'warning');
+      return false;
+    }
+    if (filledDates.length < 3) {
+      const errorMsg = `Please provide all 3 proposed dates (${filledDates.length}/3 provided)`;
+      setError(errorMsg);
+      showToast(errorMsg, 'warning');
+      return false;
+    }
+
+    // Validate dates are in the future
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const pastDates = proposedDates.filter(date => {
+      const proposedDate = new Date(date);
+      return proposedDate < today;
+    });
+    if (pastDates.length > 0) {
+      const errorMsg = 'All proposed dates must be in the future';
+      setError(errorMsg);
+      showToast(errorMsg, 'warning');
       return false;
     }
 
     // Validate location
-    if (!postalCode.trim() || !streetName.trim()) {
-      setError('Please provide both postal code and street name');
+    if (!postalCode.trim()) {
+      const errorMsg = 'Please provide a postal code';
+      setError(errorMsg);
+      showToast(errorMsg, 'warning');
+      return false;
+    }
+    if (!streetName.trim()) {
+      const errorMsg = 'Please provide a street name (use Lookup button or enter manually)';
+      setError(errorMsg);
+      showToast(errorMsg, 'warning');
       return false;
     }
 
@@ -104,7 +149,6 @@ export default function EventForm({ companyName, companyId }: EventFormProps) {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
 
     if (!validateForm()) {
       return;
@@ -131,26 +175,30 @@ export default function EventForm({ companyName, companyId }: EventFormProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error?.message || 'Failed to create event');
+        const errorMsg = data.error?.message || 'Failed to create event';
+        setError(errorMsg);
+        showToast(errorMsg, 'error');
         setIsSubmitting(false);
         return;
       }
 
-      setSuccess('Event created successfully!');
+      showToast('Event created successfully!', 'success');
       
       // Reset form
       setSelectedEventItem('');
       setProposedDates(['', '', '']);
       setPostalCode('');
       setStreetName('');
+      setError('');
 
       // Refresh the page to show the new event
       setTimeout(() => {
         router.refresh();
-        setSuccess('');
-      }, 1500);
+      }, 1000);
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      const errorMsg = 'An unexpected error occurred. Please try again.';
+      setError(errorMsg);
+      showToast(errorMsg, 'error');
       setIsSubmitting(false);
     }
   };
@@ -180,10 +228,13 @@ export default function EventForm({ companyName, companyId }: EventFormProps) {
           id="eventItem"
           value={selectedEventItem}
           onChange={(e) => setSelectedEventItem(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+          disabled={isLoadingItems}
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           required
         >
-          <option value="">Select an event type</option>
+          <option value="">
+            {isLoadingItems ? 'Loading event types...' : 'Select an event type'}
+          </option>
           {eventItems.map((item) => (
             <option key={item._id} value={item._id}>
               {item.name}
@@ -261,13 +312,6 @@ export default function EventForm({ companyName, companyId }: EventFormProps) {
       {error && (
         <div className="rounded-md bg-red-50 p-4">
           <p className="text-sm text-red-800">{error}</p>
-        </div>
-      )}
-
-      {/* Success Message */}
-      {success && (
-        <div className="rounded-md bg-green-50 p-4">
-          <p className="text-sm text-green-800">{success}</p>
         </div>
       )}
 

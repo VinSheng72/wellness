@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '@/app/components/Toast';
 import { SerializedEvent } from './EventTable';
 
 type EventModalProps = {
@@ -18,6 +19,7 @@ type EventModalProps = {
  * Requirements: 3.5, 4.5, 5.1, 5.2, 5.3, 6.1, 6.2
  */
 export default function EventModal({ event, userRole, onClose, onEventUpdate }: EventModalProps) {
+  const { showToast } = useToast();
   const [isApproving, setIsApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -70,12 +72,15 @@ export default function EventModal({ event, userRole, onClose, onEventUpdate }: 
       }
 
       // Success - refresh the page or notify parent
+      showToast('Event approved successfully!', 'success');
       if (onEventUpdate) {
         onEventUpdate();
       }
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to approve event');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to approve event';
+      setError(errorMsg);
+      showToast(errorMsg, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -105,12 +110,15 @@ export default function EventModal({ event, userRole, onClose, onEventUpdate }: 
       }
 
       // Success - refresh the page or notify parent
+      showToast('Event rejected successfully', 'success');
       if (onEventUpdate) {
         onEventUpdate();
       }
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to reject event');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to reject event';
+      setError(errorMsg);
+      showToast(errorMsg, 'error');
     } finally {
       setIsSubmitting(false);
     }
