@@ -1,0 +1,1 @@
+{"version":3,"file":"approve-event.dto.js","sourceRoot":"","sources":["../../../../src/events/dto/approve-event.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAA+C;AAC/C,6CAA8C;AAE9C,MAAa,eAAe;IAM1B,aAAa,CAAS;CACvB;AAPD,0CAOC;AADC;IALC,IAAA,8BAAY,GAAE;IACd,IAAA,qBAAW,EAAC;QACX,OAAO,EAAE,YAAY;QACrB,WAAW,EAAE,oDAAoD;KAClE,CAAC;;sDACoB"}
