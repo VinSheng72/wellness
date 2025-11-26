@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import AuthService from '@/lib/services/AuthService';
+import { connectDB } from '@/lib/db/connection';
 
 /**
  * POST /api/auth/login
@@ -7,6 +8,9 @@ import AuthService from '@/lib/services/AuthService';
  */
 export async function POST(request: NextRequest) {
   try {
+    // Ensure database connection
+    await connectDB();
+
     // Parse request body
     const body = await request.json();
     const { username, password } = body;

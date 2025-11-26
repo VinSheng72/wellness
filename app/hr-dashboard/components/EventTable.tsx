@@ -143,6 +143,10 @@ export default function EventTable({ events, userRole }: EventTableProps) {
           event={selectedEvent}
           userRole={userRole}
           onClose={() => setSelectedEvent(null)}
+          onEventUpdate={() => {
+            // Refresh the page to get updated data
+            window.location.reload();
+          }}
         />
       )}
     </>

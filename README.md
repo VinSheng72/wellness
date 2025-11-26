@@ -34,6 +34,14 @@ cp .env.example .env
 
 4. Update the `.env` file with your MongoDB URI and JWT secret
 
+5. Seed the database with sample data:
+
+```bash
+npm run seed
+```
+
+This will populate the database with sample companies, vendors, event items, and user accounts.
+
 ### Run the development server:
 
 ```bash
@@ -51,6 +59,58 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Demo Credentials
+
+After running the seed script (`npm run seed`), you can log in with the following test accounts:
+
+### HR Admin Accounts
+
+These accounts can create wellness event requests for their respective companies:
+
+| Username | Password | Company |
+|----------|----------|---------|
+| `hr_tech` | `password123` | Tech Innovations Inc |
+| `hr_global` | `password123` | Global Health Solutions |
+| `hr_wellness` | `password123` | Wellness Corp |
+
+### Vendor Admin Accounts
+
+These accounts can approve or reject event requests for their respective vendors:
+
+| Username | Password | Vendor |
+|----------|----------|--------|
+| `vendor_healthfirst` | `password123` | HealthFirst Wellness |
+| `vendor_vitality` | `password123` | Vitality Screening Services |
+| `vendor_mindbody` | `password123` | MindBody Wellness |
+
+### Sample Event Items
+
+The seed script creates the following event items with vendor associations:
+
+- **Health Talk - Nutrition** → HealthFirst Wellness
+- **Health Talk - Mental Wellness** → MindBody Wellness
+- **Onsite Health Screening** → Vitality Screening Services
+- **Fitness Assessment** → MindBody Wellness
+- **Health Talk - Chronic Disease Prevention** → HealthFirst Wellness
+
+## Database Management
+
+### Seeding the Database
+
+To populate the database with sample data for testing:
+
+```bash
+npm run seed
+```
+
+This script will:
+1. Clear all existing data from the database
+2. Create sample companies, vendors, and event items
+3. Create HR Admin and Vendor Admin user accounts
+4. Display a summary of created data and login credentials
+
+**Note**: The seed script will delete all existing data before inserting new data. Use with caution in production environments.
 
 ## Learn More
 
