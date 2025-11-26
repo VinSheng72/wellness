@@ -11,7 +11,6 @@ export class UserRepository {
    * @returns The user document or null if not found
    */
   async findByUsername(username: string): Promise<IUser | null> {
-    console.log("inside")
     return await User.findOne({ username }).exec();
   }
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/app/components/Toast';
 
 type EventItem = {
   _id: string;
@@ -22,6 +23,7 @@ type EventFormProps = {
  */
 export default function EventForm({ companyName, companyId }: EventFormProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [eventItems, setEventItems] = useState<EventItem[]>([]);
   const [selectedEventItem, setSelectedEventItem] = useState('');
   const [proposedDates, setProposedDates] = useState<string[]>(['', '', '']);
@@ -30,7 +32,6 @@ export default function EventForm({ companyName, companyId }: EventFormProps) {
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   // Fetch event items on component mount
   useEffect(() => {
