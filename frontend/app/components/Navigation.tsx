@@ -1,15 +1,18 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useAuth } from '@/lib/auth';
 
 export default function Navigation() {
-  const router = useRouter();
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Don't show navigation on login page
-  if (pathname === '/login') {
+  // Only show navigation on dashboard routes
+  const shouldShowNavigation = pathname.startsWith('/hr-dashboard') || pathname.startsWith('/vendor-dashboard');
+  
+  if (!shouldShowNavigation) {
     return null;
   }
 
@@ -17,21 +20,10 @@ export default function Navigation() {
     setIsLoggingOut(true);
     
     try {
-      // Clear the session cookie by calling logout endpoint
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        // Redirect to login page
-        router.push('/login');
-      } else {
-        // Even if logout fails, redirect to login
-        router.push('/login');
-      }
+      await logout();
     } catch (error) {
-      // On error, still redirect to login
-      router.push('/login');
+      // Logout method already handles redirect
+      console.error('Logout error:', error);
     } finally {
       setIsLoggingOut(false);
     }
@@ -40,27 +32,36 @@ export default function Navigation() {
   // Determine current page title
   const getPageTitle = () => {
     if (pathname.startsWith('/hr-dashboard')) {
-      return 'HR Dashboard';
+      return 'HR Admin Dashboard';
     } else if (pathname.startsWith('/vendor-dashboard')) {
-      return 'Vendor Dashboard';
+      return 'Vendor Admin Dashboard';
     }
-    return 'Wellness Event Booking';
+    return '';
   };
+
+  const pageTitle = getPageTitle();
 
   return (
     <nav className="bg-blue-600 text-white shadow-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
             <h1 className="text-xl font-bold">
               Wellness Event Booking
             </h1>
-            <span className="ml-4 text-sm text-blue-100">
-              {getPageTitle()}
-            </span>
+            {pageTitle && (
+              <span className="text-lg font-medium text-blue-100">
+                | {pageTitle}
+              </span>
+            )}
           </div>
           
           <div className="flex items-center space-x-4">
+            {user && (
+              <span className="text-sm font-medium text-blue-100">
+                {user.username}
+              </span>
+            )}
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}

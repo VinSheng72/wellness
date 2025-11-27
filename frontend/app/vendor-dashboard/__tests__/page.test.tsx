@@ -81,7 +81,7 @@ describe('Vendor Dashboard', () => {
     render(<VendorDashboardPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Vendor Admin Dashboard')).toBeInTheDocument();
+      expect(screen.getByText('Event Requests')).toBeInTheDocument();
     });
 
     expect(apiClient.getEvents).toHaveBeenCalled();

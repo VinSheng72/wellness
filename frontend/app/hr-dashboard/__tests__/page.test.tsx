@@ -82,7 +82,7 @@ describe('HR Dashboard', () => {
     render(<HRDashboardPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('HR Admin Dashboard')).toBeInTheDocument();
+      expect(screen.getByText('Create New Event')).toBeInTheDocument();
     });
 
     expect(apiClient.getEvents).toHaveBeenCalled();
