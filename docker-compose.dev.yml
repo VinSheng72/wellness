@@ -1,0 +1,24 @@
+services:
+  # MongoDB Database for Development
+  mongodb:
+    image: mongo
+    container_name: wellness-mongodb-dev
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: wellness-events
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_dev_data:/data/db
+    networks:
+      - wellness-network-dev
+
+volumes:
+  mongodb_dev_data:
+    driver: local
+
+networks:
+  wellness-network-dev:
+    driver: bridge
