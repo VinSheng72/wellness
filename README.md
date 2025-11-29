@@ -30,8 +30,17 @@ npm run dev
 - API Docs: http://localhost:3001/api/docs
 
 **Test Credentials:**
-- HR Admin: `hr_tech` / `password123`
-- Vendor Admin: `vendor_spa` / `password123`
+
+HR Admin Accounts:
+- `hr_tech` / `password123` - Tech Innovations Inc
+- `hr_global` / `password123` - Global Solutions Pte Ltd
+- `hr_creative` / `password123` - Creative Minds Co
+
+Vendor Admin Accounts:
+- `vendor_spa` / `password123` - Wellness Spa & Massage
+- `vendor_fitness` / `password123` - Fitness First Corporate
+- `vendor_yoga` / `password123` - Mindful Yoga Studio
+- `vendor_catering` / `password123` - Healthy Eats Catering
 
 ## Documentation
 
